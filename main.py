@@ -1,6 +1,7 @@
 # Robot swarm site selection project
 
 from vacuum import vacuum as vacuumObj
+from Site import *
 import enums.constants as con
 import enums.walls as walls
 import random, pygame, sys
@@ -12,7 +13,8 @@ def main():
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((con.WINDOWWIDTH, con.WINDOWHEIGHT))
     BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
-    pygame.display.set_caption('Roomba')
+    pygame.display.set_caption('Swarm Site Select Simulation')
+
 
     while True:
         runGame()
@@ -21,6 +23,10 @@ def runGame():
     color_iteration_size = 0 if con.NUM_ROOMBAS < 2 else int(1530 / (con.NUM_ROOMBAS))
     all_coords     = [[x, y] for x in range(0, con.WIDTH_IN_CELLS) for y in range(0, con.HEIGHT_IN_CELLS)]
     free_locations = [x for x in all_coords if x not in walls.values]
+
+    #init environment
+    site1 = Site(2)
+    # print(site1)
 
     # initialize roombas
     curr_color = 0
@@ -58,10 +64,11 @@ def runGame():
 
     while True: 
         DISPLAYSURF.fill(con.WHITE)
+        drawTiles(site1.board)
         drawGrid()
         drawStuff(walls)
-        drawDirt(heavy_dirt)
-        drawDirt(dirt)
+        # drawDirt(heavy_dirt)
+        # drawDirt(dirt)
         drawVacuums(vacuums)
 
         for vacuum in vacuums:
@@ -95,9 +102,9 @@ def drawVacuums(vacuums):
 
 def drawGrid():
     for x in range(0, con.WINDOWWIDTH, con.CELLSIZE): # draw vertical lines
-        pygame.draw.line(DISPLAYSURF, con.LIGHTGRAY, (x, 0), (x, con.WINDOWHEIGHT))
+        pygame.draw.line(DISPLAYSURF, con.BLACK, (x, 0), (x, con.WINDOWHEIGHT))
     for y in range(0, con.WINDOWHEIGHT, con.CELLSIZE): # draw horizontal lines
-        pygame.draw.line(DISPLAYSURF, con.LIGHTGRAY, (0, y), (con.WINDOWWIDTH, y))
+        pygame.draw.line(DISPLAYSURF, con.BLACK, (0, y), (con.WINDOWWIDTH, y))
 
 def drawStuff(stuffs):
     for stuff in stuffs.values:
@@ -108,6 +115,13 @@ def drawDirt(dirts):
     for dirt in dirts['values']:
         dirtRect = pygame.Rect(dirt[0] * con.CELLSIZE, dirt[1] * con.CELLSIZE, con.CELLSIZE, con.CELLSIZE)
         pygame.draw.rect(DISPLAYSURF, dirts['color'], dirtRect)
+
+def drawTiles(board):
+    color_map = {0: con.BLUE, 1: con.GREEN, 2: con.ORANGE}
+    for row_index in range(len(board)):
+        for col_index in range(len(board[row_index])):
+            tileRect = pygame.Rect((1 + row_index) * con.CELLSIZE, (1 + col_index) * con.CELLSIZE, con.CELLSIZE, con.CELLSIZE)
+            pygame.draw.rect(DISPLAYSURF, color_map[board[row_index][col_index]], tileRect)
 
 if __name__ == '__main__':
     main()
