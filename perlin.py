@@ -145,7 +145,7 @@ def generate_perlin_noise(width, height, octaves=2, persistence=0.5, lacunarity=
     return noise_array
 
 if __name__ == '__main__':
-    random.seed('brad')
+    # random.seed('brad')
     perlin_map = generate_perlin_noise(20, 20, 5, 0.2, 5)
     print(perlin_map)
     perlin_map = np.array(perlin_map)

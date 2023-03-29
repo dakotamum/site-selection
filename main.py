@@ -25,7 +25,7 @@ def runGame():
     free_locations = [x for x in all_coords if x not in walls.values]
 
     #init environment
-    site1 = Site(2)
+    site1 = Site(0, (0,100,0))
     # print(site1)
 
     # initialize roombas
