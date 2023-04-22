@@ -13,7 +13,7 @@ WINDOWHEIGHT = 800 + (BORDER_WIDTH * 2 * CELLSIZE) + (TITLE_HEIGHT * CELLSIZE)
 assert WINDOWWIDTH % CELLSIZE == 0, "Window width must be a multiple of cell size."
 assert WINDOWHEIGHT % CELLSIZE == 0, "Window height must be a multiple of cell size."
 
-NUM_ROOMBAS = 10
+NUM_DRONES = 10
 
 #             R    G    B
 WHITE     = (255, 255, 255)

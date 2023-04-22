@@ -1,5 +1,5 @@
 from random import randint, sample
-from vacuum import *
+from Drone import *
 from Site import *
 import enums.constants
 
@@ -14,7 +14,6 @@ import enums.constants
         List of sites
 """
 
-
 class Swarm:
     agents = []
     sites = []
@@ -25,7 +24,7 @@ class Swarm:
 
     def generate_agents(self, agentCount):
         for i in range(agentCount):
-            self.agents.append(vacuum([randint(0, 20), randint(0, 20)], enums.constants.BLACK))
+            self.agents.append(Drone([randint(0, 20), randint(0, 20)], enums.constants.BLACK))
 
     def generate_sites(self, siteCount, sitePattern, target):
         self.sites.append(Site(sitePattern, target))

@@ -2,7 +2,7 @@ import random
 import enums.constants as con
 import enums.walls as walls
 
-class vacuum:
+class Drone:
     def __init__(self, coords, color):
         self.direction = random.choice([1, 2, 3, 4])
         self.current_coordinates = coords
@@ -22,16 +22,3 @@ class vacuum:
             if self.forward_coords() not in walls.values:
                 self.current_coordinates = self.forward_coords()
                 validMove = True
-
-    def move(self):
-        if self.straight_moves_left > 0:
-            if self.forward_coords() not in walls.values:
-                self.current_coordinates = self.forward_coords()
-                self.straight_moves_left -= 1
-            else:
-                self.random_move()
-                self.straight_moves_left = random.choice([i for i in range(10)])
-        else:
-            self.straight_moves_left = random.choice([i for i in range(10)])
-            self.random_move()
-        return
