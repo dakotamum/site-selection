@@ -2,6 +2,7 @@
 
 from vacuum import vacuum as vacuumObj
 from Site import *
+from swarm import *
 import enums.constants as con
 import enums.walls as walls
 import random, pygame, sys
@@ -23,9 +24,11 @@ def runGame():
     color_iteration_size = 0 if con.NUM_ROOMBAS < 2 else int(1530 / (con.NUM_ROOMBAS))
     all_coords     = [[x, y] for x in range(0, con.WIDTH_IN_CELLS) for y in range(0, con.HEIGHT_IN_CELLS)]
     free_locations = [x for x in all_coords if x not in walls.values]
+    print(free_locations)
 
     #init environment
     site1 = Site(0, (0,100,0))
+    swarm1 = Swarm(10, 10, 0, (0,100,0))
     # print(site1)
 
     # initialize roombas
