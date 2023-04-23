@@ -1,3 +1,6 @@
+import numpy as np
+from itertools import product
+
 FPS = 2
 SITE_WIDTH_IN_CELLS = 20
 SITE_HEIGHT_IN_CELLS = 20
@@ -8,8 +11,8 @@ TITLE_HEIGHT = 0
 HEIGHT_IN_CELLS = SITE_HEIGHT_IN_CELLS + (BORDER_WIDTH * 2) + TITLE_HEIGHT
 
 CELLSIZE = 40
-WINDOWWIDTH = 800 + (BORDER_WIDTH * 2 * CELLSIZE)
-WINDOWHEIGHT = 800 + (BORDER_WIDTH * 2 * CELLSIZE) + (TITLE_HEIGHT * CELLSIZE)
+WINDOWWIDTH = 800
+WINDOWHEIGHT = 800
 assert WINDOWWIDTH % CELLSIZE == 0, "Window width must be a multiple of cell size."
 assert WINDOWHEIGHT % CELLSIZE == 0, "Window height must be a multiple of cell size."
 
@@ -33,10 +36,15 @@ BGCOLOR = LIGHTGRAY
 
 #Tile coloring
 
-
-
 LEFT = 1
 DOWN = 2
 RIGHT = 3
 UP = 4
 
+# define possibility candidates matrix K
+possible_range = np.arange(0.1, 1.0, 0.1)
+colors = []
+for p in product(possible_range, repeat=3):
+    if np.isclose(sum(p), 1.0):
+        colors.append(p)
+K = np.array(colors)        

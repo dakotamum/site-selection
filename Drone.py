@@ -1,6 +1,5 @@
 import random
-import enums.constants as con
-import enums.walls as walls
+import numpy as np
 
 class Drone:
     def __init__(self, coords, color):
@@ -8,6 +7,8 @@ class Drone:
         self.current_coordinates = coords
         self.color = color
         self.straight_moves_left = random.choice([i for i in range(10)])
+        self.beliefs = np.full((36, 1), 1/36)
+        self.stored_beliefs = []
 
     def forward_coords(self):
         x = self.current_coordinates[0]; y = self.current_coordinates[1]
@@ -19,6 +20,10 @@ class Drone:
         validMove = False
         while (not validMove):
             self.direction = random.choice([1, 2, 3, 4])
-            if self.forward_coords() not in walls.values:
+            if self.forward_coords()[0] > -1 and self.forward_coords()[0] < 20 and self.forward_coords()[1] > -1 and self.forward_coords()[1] < 20:
                 self.current_coordinates = self.forward_coords()
                 validMove = True
+
+    def update_beliefs(self, K, obs):
+        rho_normal = np.linalg.norm(np.multiply(self.beliefs, np.dot(K, obs).reshape(-1, 1)))
+        self.beliefs = np.multiply(self.beliefs, np.dot(K, obs).reshape(-1, 1)) / rho_normal

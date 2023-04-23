@@ -1,0 +1,7 @@
+{
+   "headless_mode": false,
+   "num_drones": 10,
+   "num_sites": 3,
+   "num_timesteps": 5,
+   "target_color_ratio": [33, 33, 34]
+}

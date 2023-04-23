@@ -54,7 +54,7 @@ class Site:
     def get_current_percentage(self):
         """Returns the make-up of the board by percentage of each feature. Given by a three value list, with the index corasponding to feature."""
         self.current_percentage = [list(chain.from_iterable(self.board)).count(feature_index)/400 for feature_index in range(0,3)]
-        print(self.current_percentage)
+        # print(self.current_percentage)
         return self.current_percentage
 
     def __random_gen(self):
