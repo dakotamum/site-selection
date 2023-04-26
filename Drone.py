@@ -24,6 +24,14 @@ class Drone:
                 self.current_coordinates = self.forward_coords()
                 validMove = True
 
+    def get_vote(self):
+        vote = []
+        for index, belief in enumerate(self.stored_beliefs):
+            vote.append((belief[-1], index))
+        vote.sort(key=lambda x: x[0], reverse=True)
+        return [x[1] for x in vote]
+
     def update_beliefs(self, K, obs):
         rho_normal = np.linalg.norm(np.multiply(self.beliefs, np.dot(K, obs).reshape(-1, 1)))
         self.beliefs = np.multiply(self.beliefs, np.dot(K, obs).reshape(-1, 1)) / rho_normal
+

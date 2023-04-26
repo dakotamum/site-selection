@@ -47,10 +47,12 @@ class Swarm:
         
     def generate_sites(self, siteCount, sitePattern, target):
         self.sites.append(Site(sitePattern, target))
+        print(target)
         for i in range(siteCount - 1):
             # Generate 3 random numbers that sum to 100
             dividers = sorted(sample(range(1, 100), 2))
             feat1, feat2, feat3 = (a - b for a, b in zip(dividers + [100], [0] + dividers))
+            print("[%s, %s, %s]" % (feat1, feat2, feat3))
             self.sites.append(Site(sitePattern, [feat1, feat2, feat3]))
 
     def simulate(self, CONFIG):
@@ -108,7 +110,7 @@ class Swarm:
         for agent in self.agents:
             vote = agent.get_vote()
             for i in range(len(vote)):
-                voteTotals[vote[i]] += (len(self.sites))
+                voteTotals[vote[i]] += (len(self.sites) - i)
         return voteTotals
 
     def drawDrones(self, drones):

@@ -3,5 +3,5 @@
    "num_drones": 10,
    "num_sites": 3,
    "num_timesteps": 5,
-   "target_color_ratio": [33, 33, 34]
+   "target_color_ratio": [80, 10, 10]
 }
