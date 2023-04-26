@@ -16,7 +16,7 @@ def main():
         """"""
 
 def runGame():
-    swarm1 = Swarm(agentCount=CONFIG['num_drones'], siteCount=CONFIG['num_sites'], sitePattern=1, target=CONFIG['target_color_ratio'])
+    swarm1 = Swarm(agentCount=CONFIG['num_drones'], siteCount=CONFIG['num_sites'], sitePattern=2, target=CONFIG['target_color_ratio'])
     swarm1.simulate(CONFIG)
     np.set_printoptions(formatter={'float': lambda x: "{0:0.3f}".format(x)})
     #print(swarm1.agents[0].stored_beliefs)

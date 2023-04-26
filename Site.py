@@ -1,6 +1,7 @@
 from operator import is_
 from random import randint, random
 from enum import Enum
+from re import L
 
 from numpy import block
 from perlin import generate_perlin_noise
@@ -111,20 +112,36 @@ class Site:
     def __perlin_gen(self):
         """Generates 20x20 environment board using perlin noise to create a natural-looking environment"""
         if self.target_percentage is not None:
-            raise NotImplementedError("Target ratio not yet implemented with perlin distribution")
-
-        perlin_map = generate_perlin_noise(20, 20, 5, 0.99, 5)
-        # print(perlin_map)
-        for row_index in range(len(perlin_map)):
-            for col_index in range(len(perlin_map[row_index])):
-                if perlin_map[row_index][col_index] < .6:
-                    perlin_map[row_index][col_index] = 0
-                elif perlin_map[row_index][col_index] < 0.8:
-                    perlin_map[row_index][col_index] = 1
-                else:
-                    perlin_map[row_index][col_index] = 2
-        
-        self.board = perlin_map
+            ratio_met = [False, False, False]
+            while (ratio_met != [True, True, True]):
+                perlin_map = generate_perlin_noise(20, 20, randint(3,10), randint(80,100) / 100, randint(5,6))
+                for row_index in range(len(perlin_map)):
+                    for col_index in range(len(perlin_map[row_index])):
+                        if perlin_map[row_index][col_index] < self.target_percentage[0] / 100:
+                            perlin_map[row_index][col_index] = 0
+                        elif perlin_map[row_index][col_index] < (self.target_percentage[0] + self.target_percentage[1]) / 100:
+                            perlin_map[row_index][col_index] = 1
+                        else:
+                            perlin_map[row_index][col_index] = 2
+                
+                self.board = perlin_map
+                ratio_met = self.__check_ratio_status()
+                print(perlin_map)
+            print("DID IT!!!")
+  
+        else:
+            perlin_map = generate_perlin_noise(20, 20, 5, 0.99, 5)
+            # print(perlin_map)
+            for row_index in range(len(perlin_map)):
+                for col_index in range(len(perlin_map[row_index])):
+                    if perlin_map[row_index][col_index] < .6:
+                        perlin_map[row_index][col_index] = 0
+                    elif perlin_map[row_index][col_index] < 0.8:
+                        perlin_map[row_index][col_index] = 1
+                    else:
+                        perlin_map[row_index][col_index] = 2
+            
+            self.board = perlin_map
 
     def __check_ratio_status(self):
         """Returns a 3-element list of bools, each indicating whether that feature is within the needed threshold."""
@@ -135,7 +152,9 @@ class Site:
                 and self.get_current_percentage()[feature_num] * 100 <= self.target_percentage[feature_num] + self.variance:
                     print(f"{feature_num} percentage is good")
                     output[feature_num] = True
-            else: output[feature_num] = False
+            else: 
+                output[feature_num] = False
+                print(f"{feature_num} percentage is bad.")
         return output
 
 
