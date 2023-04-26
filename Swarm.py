@@ -113,6 +113,28 @@ class Swarm:
                 voteTotals[vote[i]] += (len(self.sites) - i)
         return voteTotals
 
+    def do_stv_vote(self):
+        """
+            Algorithm 3: Single Transferable Vote
+        2: Vote Tally STV (Rn)
+        3: Input: Collected ballots Rn = {rm, m = 1..M }
+        4: Output: Winning hypothesis index h∗
+        5: v : vh, h = 1..H is vote tallies of all considered hypothe-
+        ses based on 1st preference
+        6: while max(v) ≤ sum(v)/2 do
+        7: Eliminate hypothesis ˆh = argmin(v)
+        8: Votes for ˆh are transferred to their next best choice
+        9: end while
+        10: h∗ = argmax(v)
+        """
+        # firstChoice = [agent.get_vote()[0] for agent in self.agents]
+        # voteTotals = [0] * len(self.agents)
+        # voteTotals = [voteTotals[]]
+        # while (max(firstChoice) <= sum(firstChoice) / 2):
+            
+        #     # Remove all instances of the smallest vote index
+        #     pass
+
     def drawDrones(self, drones):
         for drone in drones:
             x = drone.current_coordinates[0] * con.CELLSIZE
