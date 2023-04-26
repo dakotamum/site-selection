@@ -5,6 +5,7 @@ from main import *
 import pygame, sys
 import enums.constants as con
 from pygame.locals import *
+import matplotlib.pyplot as plt
 
 """
     Class for the swarm containing all the agents.
@@ -20,11 +21,23 @@ from pygame.locals import *
 class Swarm:
     agents = []
     sites = []
+    targetIndex = 0
 
-    def __init__(self, agentCount, siteCount, sitePattern, target):
+    def __init__(self, agentCount, siteCount, sitePattern, siteType='Base'):
+        self.sites = []
+        self.agents = []
         self.generate_agents(agentCount)
-        self.generate_sites(siteCount, sitePattern, target)
+        if (siteType == 'Random'):
+            self.generate_sites(siteCount, sitePattern)
+        else:
+            self.generate_base_sites(sitePattern)
 
+    def generate_base_sites(self, sitePattern):
+        # generate sites
+        for val in con.K:
+            self.sites.append(Site(sitePattern, [val[0], val[1], val[2]]))
+        # randomly select a target site
+        self.targetIndex = randint(0, len(self.sites) - 1)
     def generate_agents(self, agentCount):
         color_iteration_size = 0 if con.NUM_DRONES < 2 else int(1530 / (con.NUM_DRONES))
         curr_color = 0
@@ -45,17 +58,19 @@ class Swarm:
             curr_color += color_iteration_size
             self.agents.append(Drone([randint(0, 19), randint(0, 19)], color))
         
-    def generate_sites(self, siteCount, sitePattern, target):
-        self.sites.append(Site(sitePattern, target))
-        print(target)
+    def generate_sites(self, siteCount, sitePattern):
+        # pick a candidate site from K
+        selectedK = randint(0, siteCount - 1)
+        self.targetIndex = 0
+        self.sites.append(Site(sitePattern, [con.K[selectedK][0], con.K[selectedK][1],
+                                             con.K[selectedK][2]]))
         for i in range(siteCount - 1):
             # Generate 3 random numbers that sum to 100
             dividers = sorted(sample(range(1, 100), 2))
             feat1, feat2, feat3 = (a - b for a, b in zip(dividers + [100], [0] + dividers))
-            print("[%s, %s, %s]" % (feat1, feat2, feat3))
             self.sites.append(Site(sitePattern, [feat1, feat2, feat3]))
 
-    def simulate(self, CONFIG):
+    def simulate(self, timesteps, CONFIG):
         if CONFIG['headless_mode'] == False:
             pygame.init()
             FPSCLOCK = pygame.time.Clock()
@@ -64,7 +79,7 @@ class Swarm:
             pygame.display.set_caption('Swarm Site Select Simulation')
         for site in self.sites:
             # TODO the agents will need to be given the new site and new starting coordinates here
-            for step in range(CONFIG['num_timesteps']):
+            for step in range(timesteps):
                 if CONFIG['headless_mode'] == False:
                     DISPLAYSURF.fill(con.WHITE)
                     self.drawTiles(site.board)
@@ -99,7 +114,7 @@ class Swarm:
     def do_dowdall_vote(self):
         voteTotals = [0] * len(self.sites)
         for agent in self.agents:
-            vote = agent.get_vote()
+            vote = agent.get_vote(self.targetIndex)
             for i in range(len(vote)):
                 voteTotals[vote[i]] += 1 / (i + 1)
 
@@ -108,7 +123,7 @@ class Swarm:
     def do_borda_vote(self):
         voteTotals = [0] * len(self.sites)
         for agent in self.agents:
-            vote = agent.get_vote()
+            vote = agent.get_vote(self.targetIndex)
             for i in range(len(vote)):
                 voteTotals[vote[i]] += (len(self.sites) - i)
         return voteTotals
