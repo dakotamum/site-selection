@@ -35,7 +35,7 @@ class Swarm:
     def generate_base_sites(self, sitePattern):
         # generate sites
         for val in con.K:
-            self.sites.append(Site(sitePattern, [val[0], val[1], val[2]]))
+            self.sites.append(Site(sitePattern, [val[0] * 100, val[1] * 100, val[2] * 100]))
         # randomly select a target site
         self.targetIndex = randint(0, len(self.sites) - 1)
     def generate_agents(self, agentCount):
@@ -60,10 +60,10 @@ class Swarm:
         
     def generate_sites(self, siteCount, sitePattern):
         # pick a candidate site from K
-        selectedK = randint(0, siteCount - 1)
+        selectedK = randint(0, 35)
         self.targetIndex = 0
-        self.sites.append(Site(sitePattern, [con.K[selectedK][0], con.K[selectedK][1],
-                                             con.K[selectedK][2]]))
+        self.sites.append(Site(sitePattern, [con.K[selectedK][0] * 100, con.K[selectedK][1] * 100,
+                                             con.K[selectedK][2] * 100]))
         for i in range(siteCount - 1):
             # Generate 3 random numbers that sum to 100
             dividers = sorted(sample(range(1, 100), 2))
