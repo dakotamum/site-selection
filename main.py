@@ -16,9 +16,9 @@ def main():
         """"""
 
 def runGame():
-    #do_timestep(1, 100, 1, 100)
+    do_timestep(1, 100, 1, 10)
     #do_agents(1, 100, 1, 100)
-    do_sites(10, 100, 1, 100)
+    #do_sites(10, 100, 1, 100)
     return False
 
 def do_sites(lowerBound, upperBound, step, trials):
@@ -38,11 +38,11 @@ def do_sites(lowerBound, upperBound, step, trials):
             swarm.simulate(CONFIG['num_timesteps'], CONFIG)
 
             dowdall_totals = swarm.do_dowdall_vote()
-            if swarm.targetIndex == dowdall_totals.index(max(dowdall_totals)):
+            if swarm.targetIndex == dowdall_totals[0]:
                 dowdallCorrect += 1
 
             borda_totals = swarm.do_borda_vote()
-            if swarm.targetIndex == borda_totals.index(max(borda_totals)):
+            if swarm.targetIndex == borda_totals[0]:
                 bordaCorrect += 1
         dowdallRecord.append((dowdallCorrect / trials) * 100)
         bordaRecord.append((bordaCorrect / trials) * 100)
@@ -74,11 +74,11 @@ def do_agents(lowerBound, upperBound, step, trials):
             swarm.simulate(CONFIG['num_timesteps'], CONFIG)
 
             dowdall_totals = swarm.do_dowdall_vote()
-            if swarm.targetIndex == dowdall_totals.index(max(dowdall_totals)):
+            if swarm.targetIndex == dowdall_totals[0]:
                 dowdallCorrect += 1
 
             borda_totals = swarm.do_borda_vote()
-            if swarm.targetIndex == borda_totals.index(max(borda_totals)):
+            if swarm.targetIndex == borda_totals[0]:
                 bordaCorrect += 1
         dowdallRecord.append((dowdallCorrect / trials) * 100)
         bordaRecord.append((bordaCorrect / trials) * 100)
@@ -111,18 +111,18 @@ def do_timestep(lowerBound, upperBound, step, trials):
             swarm.simulate(i, CONFIG)
 
             dowdall_totals = swarm.do_dowdall_vote()
-            if swarm.targetIndex == dowdall_totals.index(max(dowdall_totals)):
+            if swarm.targetIndex == dowdall_totals[0]:
                 dowdallCorrect += 1
 
             borda_totals = swarm.do_borda_vote()
-            if swarm.targetIndex == borda_totals.index(max(borda_totals)):
+            if swarm.targetIndex == borda_totals[0]:
                 bordaCorrect += 1
         dowdallRecord.append(dowdallCorrect / trials)
         bordaRecord.append(bordaCorrect / trials)
         i += step
 
-    dowdallRecord.append((dowdallCorrect / trials) * 100)
-    bordaRecord.append((bordaCorrect / trials) * 100)
+    plt.plot(timesteps, bordaRecord, label='Borda')
+    plt.plot(timesteps, dowdallRecord, label='Dowdall')
     plt.legend()
     plt.clf()
     plt.title('Swarm Accuracy vs Number of Simulated Timesteps')
