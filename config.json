@@ -1,5 +1,5 @@
 {
-   "headless_mode": false,
+   "headless_mode": true,
    "num_drones": 10,
    "num_sites": 10,
    "num_timesteps": 5,
