@@ -24,10 +24,10 @@ class Drone:
                 self.current_coordinates = self.forward_coords()
                 validMove = True
 
-    def get_vote(self):
+    def get_vote(self, targetIndex):
         vote = []
         for index, belief in enumerate(self.stored_beliefs):
-            vote.append((belief[-1], index))
+            vote.append((belief[targetIndex], index))
         vote.sort(key=lambda x: x[0], reverse=True)
         return [x[1] for x in vote]
 
