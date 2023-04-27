@@ -16,7 +16,11 @@ WINDOWHEIGHT = 800
 assert WINDOWWIDTH % CELLSIZE == 0, "Window width must be a multiple of cell size."
 assert WINDOWHEIGHT % CELLSIZE == 0, "Window height must be a multiple of cell size."
 
+HEADLESS_MODE = False
 NUM_DRONES = 10
+NUM_SITES = 10
+NUM_TIMESTEPS = 5
+TARGET_COLOR_RATIO = [80, 10, 10]
 
 #             R    G    B
 WHITE     = (255, 255, 255)

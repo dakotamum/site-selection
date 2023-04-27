@@ -73,8 +73,8 @@ class Swarm:
             feat1, feat2, feat3 = (a - b for a, b in zip(dividers + [100], [0] + dividers))
             self.sites.append(Site(sitePattern, [feat1, feat2, feat3]))
 
-    def simulate(self, timesteps, CONFIG):
-        if CONFIG['headless_mode'] == False:
+    def simulate(self, timesteps):
+        if con.HEADLESS_MODE == False:
             pygame.init()
             FPSCLOCK = pygame.time.Clock()
             global DISPLAYSURF
@@ -83,7 +83,7 @@ class Swarm:
         for site in self.sites:
             # TODO the agents will need to be given the new site and new starting coordinates here
             for step in range(timesteps):
-                if CONFIG['headless_mode'] == False:
+                if con.HEADLESS_MODE == False:
                     DISPLAYSURF.fill(con.WHITE)
                     self.drawTiles(site.board)
                     self.drawGrid()

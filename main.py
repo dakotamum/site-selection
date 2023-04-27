@@ -6,20 +6,17 @@ from Drone import *
 from Site import *
 from Swarm import *
 from pygame.locals import *
+import matplotlib as plt
+import enums.constants as con
 
 def main():
-    global CONFIG
-    # read config
-    f = open ('config.json', "r")
-    CONFIG = json.loads(f.read())
-    while runGame():
-        """"""
+    runGame()
 
 def runGame():
     #do_sites(2, 50, 1, 10)
     do_timestep(1, 100, 1, 10)
     #do_agents(1, 50, 1, 10)
-    return False
+    # return False
 
 def do_sites(lowerBound, upperBound, step, trials):
     print('Generating site data')
@@ -34,8 +31,8 @@ def do_sites(lowerBound, upperBound, step, trials):
         dowdallCorrect = 0
         bordaCorrect = 0
         for j in range(trials):
-            swarm = Swarm(agentCount=CONFIG['num_drones'], siteCount=i, sitePattern=0, siteType='Random')
-            swarm.simulate(CONFIG['num_timesteps'], CONFIG)
+            swarm = Swarm(agentCount=con.NUM_DRONES, siteCount=i, sitePattern=0, siteType='Random')
+            swarm.simulate(con.NUM_TIMESTEPS)
 
             dowdall_totals = swarm.do_dowdall_vote()
             if swarm.targetIndex == dowdall_totals.index(max(dowdall_totals)):
@@ -78,8 +75,8 @@ def do_agents(lowerBound, upperBound, step, trials):
         dowdallCorrect = 0
         bordaCorrect = 0
         for j in range(trials):
-            swarm = Swarm(agentCount=i, siteCount=CONFIG['num_sites'], sitePattern=0, siteType='Base')
-            swarm.simulate(CONFIG['num_timesteps'], CONFIG)
+            swarm = Swarm(agentCount=i, siteCount=con.NUM_SITES, sitePattern=0, siteType='Base')
+            swarm.simulate(con.NUM_TIMESTEPS)
 
             dowdall_totals = swarm.do_dowdall_vote()
             if swarm.targetIndex == dowdall_totals.index(max(dowdall_totals)):
@@ -124,9 +121,9 @@ def do_timestep(lowerBound, upperBound, step, trials):
         bordaCorrect = 0
         stvCorrect = 0
         for j in range(trials):
-            swarm = Swarm(agentCount=CONFIG['num_drones'], siteCount=CONFIG['num_sites'], sitePattern=0,
+            swarm = Swarm(agentCount=con.NUM_DRONES, siteCount=con.NUM_SITES, sitePattern=0,
                           siteType='Base')
-            swarm.simulate(i, CONFIG)
+            swarm.simulate(i)
 
             dowdall_totals = swarm.do_dowdall_vote()
             if swarm.targetIndex == dowdall_totals.index(max(dowdall_totals)):
