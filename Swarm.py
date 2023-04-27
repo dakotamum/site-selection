@@ -2,6 +2,9 @@ from random import randint, sample
 from Drone import *
 from Site import *
 from main import *
+
+from collections import defaultdict
+from typing import List
 import pygame, sys
 import enums.constants as con
 from pygame.locals import *
@@ -127,6 +130,69 @@ class Swarm:
             for i in range(len(vote)):
                 voteTotals[vote[i]] += (len(self.sites) - i)
         return voteTotals
+
+    def do_stv_vote(self):
+        """
+            Algorithm 3: Single Transferable Vote
+        2: Vote Tally STV (Rn)
+        3: Input: Collected ballots Rn = {rm, m = 1..M }
+        4: Output: Winning hypothesis index h∗
+        5: v : vh, h = 1..H is vote tallies of all considered hypothe-
+        ses based on 1st preference
+        6: while max(v) ≤ sum(v)/2 do
+        7: Eliminate hypothesis ˆh = argmin(v)
+        8: Votes for ˆh are transferred to their next best choice
+        9: end while
+        10: h∗ = argmax(v)
+        """
+        #Get ballots
+        ballots = []
+        for agent in self.agents:
+            ballots.append(agent.vote())
+        num_candidates = max(max(ballot) for ballot in agent_ballots) + 1
+    
+        # Return a defaultdict showing first chioce data
+        def count_first_choices(ballots):
+            first_choices = defaultdict(int)
+            for ballot in ballots:
+                if len(ballot) > 0:
+                    first_choices[ballot[0]] += 1
+            return first_choices
+
+        # Take candidate out of running and addjust the ballots
+        def eliminate_candidate(candidate, ballots):
+            new_ballots = []
+            for ballot in ballots:
+                new_ballot = [c for c in ballot if c != candidate]
+                if len(new_ballot) > 0:
+                    new_ballots.append(new_ballot)
+            return new_ballots
+
+        # Finds the candidates with the most first_choices
+        def find_winner(first_choices, num_voters):
+            for candidate, votes in first_choices.items():
+                if votes > num_voters / 2:
+                    return candidate
+            return None
+
+        # Finds the candidate with the least votes
+        def find_least_votes(first_choices):
+            min_votes = float('inf')
+            least_voted = None
+            for candidate, votes in first_choices.items():
+                if votes < min_votes:
+                    min_votes = votes
+                    least_voted = candidate
+            return least_voted
+
+        # Run vote until majority winner is found
+        while True:
+            first_choices = count_first_choices(agent_ballots)
+            winner = find_winner(first_choices, len(agent_ballots))
+            if winner is not None:
+                return winner
+            least_voted = find_least_votes(first_choices)
+            agent_ballots = eliminate_candidate(least_voted, agent_ballots)
 
     def drawDrones(self, drones):
         for drone in drones:

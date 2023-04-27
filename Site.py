@@ -1,6 +1,7 @@
 from operator import is_
 from random import randint, random
 from enum import Enum
+from re import L
 
 from numpy import block
 from perlin import generate_perlin_noise
@@ -76,7 +77,6 @@ class Site:
     def __block_gen(self):
         """Generates 20x20 environment board using the block distribution described in the reasearch paper"""
         # self.target_percentage = (65, 30, 5)
-        self.target_percentage = (50, 25, 25)
         self.variance = 5
 
         self.board = [[0 for _ in range(20)] for _ in range(20)]
@@ -100,32 +100,48 @@ class Site:
                 self.board[row_index][col_index] = 2
 
         while (ratio_met != [True, True, True]):
+            # For each forground type that isn't in ratio, run increment
             for feature_num in range(1,3):
-                self.__increment_block(self.board, feature_num)
-                ratio_met = self.__check_ratio_status()
+                if not ratio_met[feature_num]:
+                    self.__increment_block(feature_num)
             if ratio_met == [False, True, True]:
-                self.__increment_bg(self.board)
-
-
+                self.__increment_bg()
+            ratio_met = self.__check_ratio_status()
         return self.board
 
     def __perlin_gen(self):
         """Generates 20x20 environment board using perlin noise to create a natural-looking environment"""
         if self.target_percentage is not None:
-            raise NotImplementedError("Target ratio not yet implemented with perlin distribution")
-
-        perlin_map = generate_perlin_noise(20, 20, 5, 0.99, 5)
-        # print(perlin_map)
-        for row_index in range(len(perlin_map)):
-            for col_index in range(len(perlin_map[row_index])):
-                if perlin_map[row_index][col_index] < .6:
-                    perlin_map[row_index][col_index] = 0
-                elif perlin_map[row_index][col_index] < 0.8:
-                    perlin_map[row_index][col_index] = 1
-                else:
-                    perlin_map[row_index][col_index] = 2
-        
-        self.board = perlin_map
+            ratio_met = [False, False, False]
+            while (ratio_met != [True, True, True]):
+                perlin_map = generate_perlin_noise(20, 20, randint(3,10), randint(80,100) / 100, randint(5,6))
+                for row_index in range(len(perlin_map)):
+                    for col_index in range(len(perlin_map[row_index])):
+                        if perlin_map[row_index][col_index] < self.target_percentage[0] / 100:
+                            perlin_map[row_index][col_index] = 0
+                        elif perlin_map[row_index][col_index] < (self.target_percentage[0] + self.target_percentage[1]) / 100:
+                            perlin_map[row_index][col_index] = 1
+                        else:
+                            perlin_map[row_index][col_index] = 2
+                
+                self.board = perlin_map
+                ratio_met = self.__check_ratio_status()
+                print(perlin_map)
+            print("DID IT!!!")
+  
+        else:
+            perlin_map = generate_perlin_noise(20, 20, 5, 0.99, 5)
+            # print(perlin_map)
+            for row_index in range(len(perlin_map)):
+                for col_index in range(len(perlin_map[row_index])):
+                    if perlin_map[row_index][col_index] < .6:
+                        perlin_map[row_index][col_index] = 0
+                    elif perlin_map[row_index][col_index] < 0.8:
+                        perlin_map[row_index][col_index] = 1
+                    else:
+                        perlin_map[row_index][col_index] = 2
+            
+            self.board = perlin_map
 
     def __check_ratio_status(self):
         """Returns a 3-element list of bools, each indicating whether that feature is within the needed threshold."""
@@ -136,7 +152,9 @@ class Site:
                 and self.get_current_percentage()[feature_num] * 100 <= self.target_percentage[feature_num] + self.variance:
                     print(f"{feature_num} percentage is good")
                     output[feature_num] = True
-            else: output[feature_num] = False
+            else: 
+                output[feature_num] = False
+                print(f"{feature_num} percentage is bad.")
         return output
 
 
@@ -144,20 +162,30 @@ class Site:
         """Adds or removes a block of the given feature"""
         #If percentage is too low, we need to add a block
         if self.get_current_percentage()[block_index] * 100 < self.target_percentage[block_index] - self.variance:
+            print(f"Percentage is too low for feature {block_index}, adding to block..")
             candidates = get_grow_candidates(self.board, block_index)
             #Change random candidate to desired feature type
             if candidates != []: 
                 random_candidate_coords = candidates[randint(0, len(candidates) - 1)]
                 self.board[random_candidate_coords[0]][random_candidate_coords[1]] = block_index
+            # If there are no spots next to block to increment, select random spot on site
             else:
-                print("no grow candidates!")
-        
+                print("adding random spot to block")
+                self.board[randint(1, 19)][randint(1, 19)] = block_index
+
         #If percentage is too high, we need to remove a block
         elif self.get_current_percentage()[block_index] * 100 > self.target_percentage[block_index] + self.variance:
+            print(f"Percentage is too high for feature {block_index}, removing from block..")
             candidates = get_shrink_candidates(self.board, block_index)
             if candidates != []: 
+                print("Removing from removal candidates")
                 random_candidate_coords = candidates[randint(0, len(candidates) - 1)]
                 self.board[random_candidate_coords[0]][random_candidate_coords[1]] = 0
+            else:
+                print("There are no removal candidates!")
+                self.board[randint(1,19)][randint(1,19)] = 0
+        else:
+            print("yo we should be good, right?")
 
     def __increment_bg(self):
         """Adds to random featuer if bg is too big, shrinks random feature if bg is too small"""

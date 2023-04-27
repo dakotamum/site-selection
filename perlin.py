@@ -140,7 +140,7 @@ def generate_perlin_noise(width, height, octaves=2, persistence=0.5, lacunarity=
             noise_array[x][y] = -1 * (noise_array[x][y] - minValue) / (minValue - maxValue)
     print(f"After gaussian_filter and minmax norm:\n{noise_array}\n\n")
     
-    plt.hist(np.array(noise_array).flatten(), bins=10)
+    # plt.hist(np.array(noise_array).flatten(), bins=10)
     plt.show()
     return noise_array
 
