@@ -26,6 +26,8 @@ def runGame(args):
         do_agents(int(args[2]), int(args[3]), int(args[4]), int(args[5]))
     elif args[1] == 'site':
         do_sites(int(args[2]), int(args[3]), int(args[4]), int(args[5]))
+    else:
+        print("Invalid Syntax")
     return False
 
 def do_sites(lowerBound, upperBound, step, trials):
