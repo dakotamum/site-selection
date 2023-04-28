@@ -15,7 +15,6 @@ import enums.constants as con
 import matplotlib.pyplot as plt
 
 def main():
-    print(sys.argv)
     if len(sys.argv) <= 1:
         print('Syntax is main.py [independent variable] [lower bound] [upper bound] [step size] [number of trials]')
         print('Independent vairables are: \'timestep\', \'agent\', and \'site\'')
