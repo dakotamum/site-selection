@@ -16,9 +16,10 @@ WINDOWHEIGHT = 800
 assert WINDOWWIDTH % CELLSIZE == 0, "Window width must be a multiple of cell size."
 assert WINDOWHEIGHT % CELLSIZE == 0, "Window height must be a multiple of cell size."
 
-HEADLESS_MODE = False
+HEADLESS_MODE = True
 NUM_DRONES = 10
 NUM_SITES = 10
+FEATURE_RATIO_VARIANCE = 5
 NUM_TIMESTEPS = 5
 TARGET_COLOR_RATIO = [80, 10, 10]
 
@@ -29,7 +30,7 @@ RED       = (255,   0,   0)
 GREEN     = (  0, 255,   0)
 DARKGREEN = (  0, 155,   0)
 DARKGRAY  = ( 100,  100,  100)
-LIGHTGRAY  = ( 200,  200,  200)
+LIGHTGRAY = ( 200,  200,  200)
 MAGENTA   = ( 255,  0, 255)
 BLUE      = (  0,   0, 255)
 CYAN      = (  0, 255, 255)
