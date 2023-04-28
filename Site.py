@@ -86,8 +86,8 @@ class Site:
         #Make a large block of 1 and 2 on 0 background
         block_size1 = int(math.sqrt(400*(self.target_percentage[1]/100)))
         block_size2 = int(math.sqrt(400*(self.target_percentage[2]/100)))
-        starting_point1 = randint(0, 20-block_size1)
-        starting_point2 = randint(0, 20-block_size2)
+        starting_point1 = randint(0, 20 - block_size1)
+        starting_point2 = randint(0, 20 - block_size2)
 
         #block 1
         for row_index in range(starting_point1, starting_point1 + block_size1):

@@ -1,14 +1,18 @@
 # Robot swarm site selection project
+
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import json
+
 import Swarm
 from Drone import *
 from Site import *
 from Swarm import *
 from pygame.locals import *
+
 import sys
 import enums.constants as con
+import matplotlib.pyplot as plt
 
 def main():
     print(sys.argv)
@@ -34,6 +38,7 @@ def do_sites(lowerBound, upperBound, step, trials):
     print('Generating site data')
     dowdallRecord = []
     bordaRecord = []
+    stvRecord = []
     timesteps = []
 
     i = lowerBound
@@ -42,6 +47,8 @@ def do_sites(lowerBound, upperBound, step, trials):
         timesteps.append(i)
         dowdallCorrect = 0
         bordaCorrect = 0
+        stvCorrect = 0
+
         for j in range(trials):
             swarm = Swarm(agentCount=con.NUM_DRONES, siteCount=i, sitePattern=0, siteType='Random')
             swarm.simulate(con.NUM_TIMESTEPS)
@@ -53,13 +60,20 @@ def do_sites(lowerBound, upperBound, step, trials):
             borda_totals = swarm.do_borda_vote()
             if swarm.targetIndex == borda_totals.index(max(borda_totals)):
                 bordaCorrect += 1
+            
+            stv_totals = swarm.do_stv_vote()
+            if swarm.targetIndex == stv_totals.index(max(stv_totals)):
+                stvCorrect += 1
+
         dowdallRecord.append((dowdallCorrect / trials) * 100)
         bordaRecord.append((bordaCorrect / trials) * 100)
+        stvRecord.append((stvCorrect / trials) * 100)
         i += step
 
     plt.clf()
     plt.plot(timesteps, bordaRecord, label='Borda')
     plt.plot(timesteps, dowdallRecord, label='Dowdall')
+    plt.plot(timesteps, stvRecord, label="STV")
     # Add Borda trendline
     zb = np.polyfit(timesteps, bordaRecord, 2)
     pb = np.poly1d(zb)
@@ -68,6 +82,10 @@ def do_sites(lowerBound, upperBound, step, trials):
     zd = np.polyfit(timesteps, dowdallRecord, 2)
     pd = np.poly1d(zd)
     plt.plot(timesteps, pd(timesteps), label='Dowdall Trendline')
+    # Add STV trendline
+    sb = np.polyfit(timesteps, stvRecord, 2)
+    sd = np.poly1d(sb)
+    plt.plot(timesteps, sd(timesteps), label='STV Trendline')
     plt.legend()
     plt.title('Swarm Accuracy vs Number of Agents')
     plt.xlabel('Sites')
@@ -78,6 +96,7 @@ def do_agents(lowerBound, upperBound, step, trials):
     print('Generating agent data')
     dowdallRecord = []
     bordaRecord = []
+    stvRecord = []
     timesteps = []
 
     i = lowerBound
@@ -86,6 +105,8 @@ def do_agents(lowerBound, upperBound, step, trials):
         timesteps.append(i)
         dowdallCorrect = 0
         bordaCorrect = 0
+        stvCorrect = 0
+
         for j in range(trials):
             swarm = Swarm(agentCount=i, siteCount=con.NUM_SITES, sitePattern=0, siteType='Base')
             swarm.simulate(con.NUM_TIMESTEPS)
@@ -97,24 +118,37 @@ def do_agents(lowerBound, upperBound, step, trials):
             borda_totals = swarm.do_borda_vote()
             if swarm.targetIndex == borda_totals.index(max(borda_totals)):
                 bordaCorrect += 1
+
+            stv_totals = swarm.do_stv_vote()
+            if swarm.targetIndex == stv_totals.index(max(stv_totals)):
+                stvCorrect += 1
         dowdallRecord.append((dowdallCorrect / trials) * 100)
         bordaRecord.append((bordaCorrect / trials) * 100)
+        stvRecord.append((stvCorrect / trials) * 100)
         i += step
 
     plt.clf()
-    plt.plot(timesteps, bordaRecord, label='Borda')
-    plt.plot(timesteps, dowdallRecord, label='Dowdall')
+    plt.plot(timesteps, bordaRecord, label='Borda', alpha=0.25, color='blue')
+    plt.plot(timesteps, dowdallRecord, label='Dowdall', alpha=0.25, color='red')
+    plt.plot(timesteps, stvRecord, label='STV', alpha=0.25, color='green')
+    
     # Add Borda trendline
     zb = np.polyfit(timesteps, bordaRecord, 2)
     pb = np.poly1d(zb)
-    plt.plot(timesteps, pb(timesteps), label='Borda Trendline')
+    plt.plot(timesteps, pb(timesteps), label='Borda Trendline', color='blue')
+
     # Add Dowdall trendline
     zd = np.polyfit(timesteps, dowdallRecord, 2)
     pd = np.poly1d(zd)
-    plt.plot(timesteps, pd(timesteps), label='Dowdall Trendline')
+    plt.plot(timesteps, pd(timesteps), label='Dowdall Trendline', color='red')
+
+    # Add STV trendline
+    zs = np.polyfit(timesteps, stvRecord, 2)
+    ps = np.poly1d(zs)
+    plt.plot(timesteps, ps(timesteps), label='STV Trendline', color='green')
     plt.legend()
     plt.title('Swarm Accuracy vs Number of Agents')
-    plt.xlabel('Agents')
+    plt.xlabel('Number of Agents')
     plt.ylabel('Accuracy (%)')
     plt.savefig('Agents.png')
 
@@ -122,6 +156,7 @@ def do_timestep(lowerBound, upperBound, step, trials):
     print('Generating timestep data')
     dowdallRecord = []
     bordaRecord = []
+    stvRecord = []
     timesteps = []
 
     i = lowerBound
@@ -130,6 +165,7 @@ def do_timestep(lowerBound, upperBound, step, trials):
         timesteps.append(i)
         dowdallCorrect = 0
         bordaCorrect = 0
+        stvCorrect = 0
         for j in range(trials):
             swarm = Swarm(agentCount=con.NUM_DRONES, siteCount=con.NUM_SITES, sitePattern=0,
                           siteType='Base')
@@ -142,21 +178,35 @@ def do_timestep(lowerBound, upperBound, step, trials):
             borda_totals = swarm.do_borda_vote()
             if swarm.targetIndex == borda_totals.index(max(borda_totals)):
                 bordaCorrect += 1
+            
+            stv_totals = swarm.do_stv_vote()
+            if swarm.targetIndex == stv_totals.index(max(stv_totals)):
+                stvCorrect += 1
+
         dowdallRecord.append((dowdallCorrect / trials) * 100)
         bordaRecord.append((bordaCorrect / trials) * 100)
+        stvRecord.append((stvCorrect / trials) * 100)
         i += step
 
     plt.clf()
     plt.plot(timesteps, bordaRecord, label='Borda')
     plt.plot(timesteps, dowdallRecord, label='Dowdall')
+    plt.plot(timesteps, stvRecord, label='STV')
+    
     # Add Borda trendline
     zb = np.polyfit(timesteps, bordaRecord, 2)
     pb = np.poly1d(zb)
     plt.plot(timesteps, pb(timesteps), label='Borda Trendline')
+
     # Add Dowdall trendline
     zd = np.polyfit(timesteps, dowdallRecord, 2)
     pd = np.poly1d(zd)
     plt.plot(timesteps, pd(timesteps), label='Dowdall Trendline')
+
+    # Add STV trendline
+    zs = np.polyfit(timesteps, stvRecord, 2)
+    ps = np.poly1d(zs)
+    plt.plot(timesteps, ps(timesteps), label='STV Trendline')
     plt.legend()
     plt.title('Swarm Accuracy vs Number of Simulated Timesteps')
     plt.xlabel('Timesteps')

@@ -41,6 +41,7 @@ class Swarm:
             self.sites.append(Site(sitePattern, [val[0] * 100, val[1] * 100, val[2] * 100]))
         # randomly select a target site
         self.targetIndex = randint(0, len(self.sites) - 1)
+        
     def generate_agents(self, agentCount):
         color_iteration_size = 0 if con.NUM_DRONES < 2 else int(1530 / (con.NUM_DRONES))
         curr_color = 0
@@ -65,13 +66,39 @@ class Swarm:
         # pick a candidate site from K
         selectedK = randint(0, 35)
         self.targetIndex = 0
-        self.sites.append(Site(sitePattern, [con.K[selectedK][0] * 100, con.K[selectedK][1] * 100,
-                                             con.K[selectedK][2] * 100]))
+        base_features = [con.K[selectedK][i] * 100 for i in range(0,3)]
+        self.sites.append(Site(sitePattern, base_features))
+
         for i in range(siteCount - 1):
-            # Generate 3 random numbers that sum to 100
+            # Generate 3 random numbers that sum to 100, with a regular variance pattern between features
+            # Get a variance value that won't make a feature go over 100%
+            maxFeatValue = max(base_features)
+            max_variance = 100 - maxFeatValue
+            variance = con.FEATURE_RATIO_VARIANCE
+            if variance > max_variance:
+                variance = max_variance - 1
+            feat1 = np.NAN
+            feat2 = np.NaN
+            feat3 = np.NaN
+            feature_choice = randint(1,2)
+            if i % 3 == 0:
+                feat1 = base_features[0] + variance
+                feat2 = base_features[1] - variance if feature_choice == 0 else base_features[1]
+                feat3 = base_features[2] if feature_choice == 0 else base_features[2] - variance
+            elif i % 3 == 1:
+                feat1 = base_features[0] - variance if feature_choice == 0 else base_features[0]
+                feat2 = base_features[1] + variance
+                feat3 = base_features[2] if feature_choice == 0 else base_features[2] - variance
+            elif i % 3 == 2:
+                feat1 = base_features[0] - variance if feature_choice == 0 else base_features[0]
+                feat2 = base_features[1] if feature_choice == 0 else base_features[1] - variance
+                feat3 = base_features[2] + variance
             dividers = sorted(sample(range(1, 100), 2))
             feat1, feat2, feat3 = (a - b for a, b in zip(dividers + [100], [0] + dividers))
-            self.sites.append(Site(sitePattern, [feat1, feat2, feat3]))
+            print(f"Feature1: {int(feat1)}")
+            print(f"Feature2: {int(feat2)}")
+            print(f"Feature3: {int(feat3)}")
+            self.sites.append(Site(sitePattern, [int(feat1), int(feat2), int(feat3)]))
 
     def simulate(self, timesteps):
         if con.HEADLESS_MODE == False:
@@ -132,24 +159,13 @@ class Swarm:
         return voteTotals
 
     def do_stv_vote(self):
-        """
-            Algorithm 3: Single Transferable Vote
-        2: Vote Tally STV (Rn)
-        3: Input: Collected ballots Rn = {rm, m = 1..M }
-        4: Output: Winning hypothesis index h∗
-        5: v : vh, h = 1..H is vote tallies of all considered hypothe-
-        ses based on 1st preference
-        6: while max(v) ≤ sum(v)/2 do
-        7: Eliminate hypothesis ˆh = argmin(v)
-        8: Votes for ˆh are transferred to their next best choice
-        9: end while
-        10: h∗ = argmax(v)
-        """
-        #Get ballots
+        # Get ballots
         ballots = []
         for agent in self.agents:
-            ballots.append(agent.vote())
-        num_candidates = max(max(ballot) for ballot in agent_ballots) + 1
+            ballots.append(agent.get_vote(self.targetIndex))
+
+        # Initialize voteTotals
+        voteTotals = [0] * len(self.sites)
     
         # Return a defaultdict showing first chioce data
         def count_first_choices(ballots):
@@ -185,14 +201,19 @@ class Swarm:
                     least_voted = candidate
             return least_voted
 
-        # Run vote until majority winner is found
+        # Run STV algorithm and update voteTotals
         while True:
-            first_choices = count_first_choices(agent_ballots)
-            winner = find_winner(first_choices, len(agent_ballots))
+            first_choices = count_first_choices(ballots)
+            winner = find_winner(first_choices, len(ballots))
             if winner is not None:
-                return winner
+                voteTotals[winner] = first_choices[winner]
+                break
             least_voted = find_least_votes(first_choices)
-            agent_ballots = eliminate_candidate(least_voted, agent_ballots)
+            voteTotals[least_voted] = first_choices[least_voted]
+            ballots = eliminate_candidate(least_voted, ballots)
+
+        return voteTotals
+
 
     def drawDrones(self, drones):
         for drone in drones:
