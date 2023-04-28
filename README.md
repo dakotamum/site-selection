@@ -14,3 +14,5 @@ Independent variales are:
 	
 'sites': Run simulations equal to the number of trials with a variable number of sites, starting 
 	from lower bound and increasing by step size to upper bound, for the agents to explore.
+	
+The GUI can be toggled by changing the HEADLESS_MODE variable in enum/constants.py
