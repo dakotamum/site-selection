@@ -4,4 +4,13 @@ This program simulates the site selection of a swarm of autonomous agents. Sites
 
 # Running
 
-The program is run with the command python main.py. A number of user options are available to change the simulation settings as seen below:
+Syntax is main.py [independent variable] [lower bound] [upper bound] [step size] [number of trials]
+Independent variales are:
+'timestep': Run simulations equal to the number of trials where the agents are given a variable amount
+	of time, starting from lower bound and increasing by step size to upper bound, to explore sites.
+	
+'agent': Run simulations equal to the number of trials with a variable number of agents, starting from 
+	lower bound and increasing by step size to upper bound, exploring sites.
+	
+'sites': Run simulations equal to the number of trials with a variable number of sites, starting 
+	from lower bound and increasing by step size to upper bound, for the agents to explore.

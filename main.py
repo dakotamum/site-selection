@@ -1,22 +1,32 @@
 # Robot swarm site selection project
-
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import json
 import Swarm
 from Drone import *
 from Site import *
 from Swarm import *
 from pygame.locals import *
-import matplotlib as plt
+import sys
 import enums.constants as con
 
 def main():
-    runGame()
+    print(sys.argv)
+    if len(sys.argv) <= 1:
+        print('Syntax is main.py [independent variable] [lower bound] [upper bound] [step size] [number of trials]')
+        print('Independent vairables are: \'timestep\', \'agent\', and \'site\'')
+    else:
+        while runGame(sys.argv):
+            """"""
 
-def runGame():
-    #do_sites(2, 50, 1, 10)
-    do_timestep(1, 100, 1, 10)
-    #do_agents(1, 50, 1, 10)
-    # return False
+def runGame(args):
+    if args[1] == 'timestep':
+        do_timestep(int(args[2]), int(args[3]), int(args[4]), int(args[5]))
+    elif args[1] == 'agent':
+        do_agents(int(args[2]), int(args[3]), int(args[4]), int(args[5]))
+    elif args[1] == 'site':
+        do_sites(int(args[2]), int(args[3]), int(args[4]), int(args[5]))
+    return False
 
 def do_sites(lowerBound, upperBound, step, trials):
     print('Generating site data')
