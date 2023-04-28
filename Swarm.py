@@ -95,9 +95,9 @@ class Swarm:
                 feat3 = base_features[2] + variance
             dividers = sorted(sample(range(1, 100), 2))
             feat1, feat2, feat3 = (a - b for a, b in zip(dividers + [100], [0] + dividers))
-            print(f"Feature1: {int(feat1)}")
-            print(f"Feature2: {int(feat2)}")
-            print(f"Feature3: {int(feat3)}")
+            #print(f"Feature1: {int(feat1)}")
+            #print(f"Feature2: {int(feat2)}")
+            #print(f"Feature3: {int(feat3)}")
             self.sites.append(Site(sitePattern, [int(feat1), int(feat2), int(feat3)]))
 
     def simulate(self, timesteps):
