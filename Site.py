@@ -127,7 +127,6 @@ class Site:
                 self.board = perlin_map
                 ratio_met = self.__check_ratio_status()
                 print(perlin_map)
-            print("DID IT!!!")
   
         else:
             perlin_map = generate_perlin_noise(20, 20, 5, 0.99, 5)
@@ -147,14 +146,14 @@ class Site:
         """Returns a 3-element list of bools, each indicating whether that feature is within the needed threshold."""
         output = [None, None, None]
         for feature_num in range(3):
-            print(f"feature number: {feature_num}\n\tcurrent percentage: {self.get_current_percentage()[feature_num] * 100}\n\tLower boound:{self.target_percentage[feature_num] - self.variance}\n\tUpper bound: {self.target_percentage[feature_num] + self.variance}")
+            # print(f"feature number: {feature_num}\n\tcurrent percentage: {self.get_current_percentage()[feature_num] * 100}\n\tLower boound:{self.target_percentage[feature_num] - self.variance}\n\tUpper bound: {self.target_percentage[feature_num] + self.variance}")
             if self.get_current_percentage()[feature_num] * 100 >= self.target_percentage[feature_num] - self.variance \
                 and self.get_current_percentage()[feature_num] * 100 <= self.target_percentage[feature_num] + self.variance:
-                    print(f"{feature_num} percentage is good")
+                    # print(f"{feature_num} percentage is good")
                     output[feature_num] = True
             else: 
                 output[feature_num] = False
-                print(f"{feature_num} percentage is bad.")
+                # print(f"{feature_num} percentage is bad.")
         return output
 
 
@@ -162,7 +161,7 @@ class Site:
         """Adds or removes a block of the given feature"""
         #If percentage is too low, we need to add a block
         if self.get_current_percentage()[block_index] * 100 < self.target_percentage[block_index] - self.variance:
-            print(f"Percentage is too low for feature {block_index}, adding to block..")
+            # print(f"Percentage is too low for feature {block_index}, adding to block..")
             candidates = get_grow_candidates(self.board, block_index)
             #Change random candidate to desired feature type
             if candidates != []: 
@@ -170,28 +169,29 @@ class Site:
                 self.board[random_candidate_coords[0]][random_candidate_coords[1]] = block_index
             # If there are no spots next to block to increment, select random spot on site
             else:
-                print("adding random spot to block")
+                # print("adding random spot to block")
                 self.board[randint(1, 19)][randint(1, 19)] = block_index
 
         #If percentage is too high, we need to remove a block
         elif self.get_current_percentage()[block_index] * 100 > self.target_percentage[block_index] + self.variance:
-            print(f"Percentage is too high for feature {block_index}, removing from block..")
+            # print(f"Percentage is too high for feature {block_index}, removing from block..")
             candidates = get_shrink_candidates(self.board, block_index)
             if candidates != []: 
-                print("Removing from removal candidates")
+                # print("Removing from removal candidates")
                 random_candidate_coords = candidates[randint(0, len(candidates) - 1)]
                 self.board[random_candidate_coords[0]][random_candidate_coords[1]] = 0
             else:
-                print("There are no removal candidates!")
+                # print("There are no removal candidates!")
                 self.board[randint(1,19)][randint(1,19)] = 0
         else:
-            print("yo we should be good, right?")
+            pass
+            # print("yo we should be good, right?")
 
     def __increment_bg(self):
         """Adds to random featuer if bg is too big, shrinks random feature if bg is too small"""
         #If background feature is too low, then add more
         if self.get_current_percentage()[0] * 100 < self.target_percentage[0] - self.variance:
-            print("Adding to bg")
+            # print("Adding to bg")
             candidates = get_shrink_candidates(self.board, randint(1,2))
             #Change random candidate to desired feature type
             if candidates != []: 
