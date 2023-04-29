@@ -29,9 +29,78 @@ def runGame(args):
         do_agents(int(args[2]), int(args[3]), int(args[4]), int(args[5]))
     elif args[1] == 'site':
         do_sites(int(args[2]), int(args[3]), int(args[4]), int(args[5]))
+    elif args[1] == 'distribution':
+        do_distributions(int(args[2]))
     else:
         print("Invalid Syntax")
     return False
+
+# Compare between random and block 
+def do_distributions(trials):
+    dowdallAccuracy = {'random': 0, 'block': 0}
+    bordaAccuracy = {'random': 0, 'block': 0}
+    stvAccuracy = {'random': 0, 'block': 0}
+
+    dowdallCorrect = {'random': 0, 'block': 0}
+    bordaCorrect = {'random': 0, 'block': 0}
+    stvCorrect = {'random': 0, 'block': 0}
+
+    for type_index, type in enumerate(['random', 'block']):
+        for _ in range(trials):
+            swarm = Swarm(agentCount=con.NUM_DRONES, siteCount=con.NUM_SITES, sitePattern=type_index, siteType='Base')
+            swarm.simulate(con.NUM_TIMESTEPS)
+
+            dowdall_totals = swarm.do_dowdall_vote()
+            if swarm.targetIndex == dowdall_totals.index(max(dowdall_totals)):
+                dowdallCorrect[type] += 1
+
+            borda_totals = swarm.do_borda_vote()
+            if swarm.targetIndex == borda_totals.index(max(borda_totals)):
+                bordaCorrect[type] += 1
+            
+            stv_totals = swarm.do_stv_vote()
+            if swarm.targetIndex == stv_totals.index(max(stv_totals)):
+                stvCorrect[type] += 1
+
+        dowdallAccuracy[type] = (dowdallCorrect[type] / trials) * 100
+        bordaAccuracy[type] = (bordaCorrect[type] / trials) * 100
+        stvAccuracy[type] = (stvCorrect[type] / trials) * 100
+
+        # Bar chart setup
+    n_groups = 2
+    bar_width = 0.25
+    opacity = 0.8
+
+    # X-axis labels
+    labels = ["Random", "Block"]
+
+    # X-axis positions for each group of bars
+    index = np.arange(n_groups)
+
+    # Create bar chart
+    fig, ax = plt.subplots()
+
+    rects1 = ax.bar(index, [dowdallAccuracy["random"], dowdallAccuracy["block"]], bar_width,
+                    alpha=opacity, color='b', label='Dowdall')
+
+    rects2 = ax.bar(index + bar_width, [bordaAccuracy["random"], bordaAccuracy["block"]], bar_width,
+                    alpha=opacity, color='r', label='Borda')
+
+    rects3 = ax.bar(index + 2 * bar_width, [stvAccuracy["random"], stvAccuracy["block"]], bar_width,
+                    alpha=opacity, color='g', label='STV')
+
+    # Add labels, title, and legend
+    ax.set_xlabel('Type')
+    ax.set_ylabel('Accuracy (%)')
+    ax.set_title('Accuracy by Type and Method')
+    ax.set_xticks(index + bar_width)
+    ax.set_xticklabels(labels)
+    ax.legend()
+
+    # Display the bar chart
+    plt.savefig('Distributions.png')
+    
+
 
 def do_sites(lowerBound, upperBound, step, trials):
     print('Generating site data')
@@ -70,21 +139,21 @@ def do_sites(lowerBound, upperBound, step, trials):
         i += step
 
     plt.clf()
-    plt.plot(timesteps, bordaRecord, label='Borda')
-    plt.plot(timesteps, dowdallRecord, label='Dowdall')
-    plt.plot(timesteps, stvRecord, label="STV")
+    plt.plot(timesteps, bordaRecord, label='Borda', alpha=0.25, color='blue')
+    plt.plot(timesteps, dowdallRecord, label='Dowdall', alpha=0.25, color='red')
+    plt.plot(timesteps, stvRecord, label="STV", alpha=0.25, color='green')
     # Add Borda trendline
-    zb = np.polyfit(timesteps, bordaRecord, 2)
+    zb = np.polyfit(timesteps, bordaRecord, 4)
     pb = np.poly1d(zb)
-    plt.plot(timesteps, pb(timesteps), label='Borda Trendline')
+    plt.plot(timesteps, pb(timesteps), label='Borda Trendline', color='blue')
     # Add Dowdall trendline
-    zd = np.polyfit(timesteps, dowdallRecord, 2)
+    zd = np.polyfit(timesteps, dowdallRecord, 4)
     pd = np.poly1d(zd)
-    plt.plot(timesteps, pd(timesteps), label='Dowdall Trendline')
+    plt.plot(timesteps, pd(timesteps), label='Dowdall Trendline', color='red')
     # Add STV trendline
-    sb = np.polyfit(timesteps, stvRecord, 2)
+    sb = np.polyfit(timesteps, stvRecord, 4)
     sd = np.poly1d(sb)
-    plt.plot(timesteps, sd(timesteps), label='STV Trendline')
+    plt.plot(timesteps, sd(timesteps), label='STV Trendline', color='green')
     plt.legend()
     plt.title('Swarm Accuracy vs Number of Agents')
     plt.xlabel('Sites')
@@ -132,17 +201,17 @@ def do_agents(lowerBound, upperBound, step, trials):
     plt.plot(timesteps, stvRecord, label='STV', alpha=0.25, color='green')
     
     # Add Borda trendline
-    zb = np.polyfit(timesteps, bordaRecord, 2)
+    zb = np.polyfit(timesteps, bordaRecord, 3)
     pb = np.poly1d(zb)
     plt.plot(timesteps, pb(timesteps), label='Borda Trendline', color='blue')
 
     # Add Dowdall trendline
-    zd = np.polyfit(timesteps, dowdallRecord, 2)
+    zd = np.polyfit(timesteps, dowdallRecord, 3)
     pd = np.poly1d(zd)
     plt.plot(timesteps, pd(timesteps), label='Dowdall Trendline', color='red')
 
     # Add STV trendline
-    zs = np.polyfit(timesteps, stvRecord, 2)
+    zs = np.polyfit(timesteps, stvRecord, 3)
     ps = np.poly1d(zs)
     plt.plot(timesteps, ps(timesteps), label='STV Trendline', color='green')
     plt.legend()
